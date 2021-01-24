@@ -5,6 +5,7 @@ import ru.hh.school.dao.EmployerDao;
 import ru.hh.school.dao.GenericDao;
 import ru.hh.school.entity.Employer;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -49,6 +50,7 @@ public class EmployerService {
   // т.к это очень долгая операция
   // однако после возвращения из сервиса нем нужно достать связанные данные
   // так что нужно принять меры к тому, чтобы не получить LazyInitializationException
+
   public void blockIfEmployerUseBadWords(int employerId) {
     Employer employer = transactionHelper.inTransaction(() -> employerDao.getEager(employerId));
 
@@ -67,6 +69,7 @@ public class EmployerService {
     // про возврат в managed состояние: https://vladmihalcea.com/jpa-persist-and-merge
 
     transactionHelper.inTransaction(() -> {
+      employerDao.merge(employer);
       employer.setBlockTime(LocalDateTime.now());
       employer.getVacancies().forEach(v -> v.setArchivingTime(LocalDateTime.now()));
     });
