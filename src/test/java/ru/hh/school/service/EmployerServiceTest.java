@@ -64,6 +64,16 @@ public class EmployerServiceTest extends BaseTest {
   }
 
   @Test
+  public void employerGetById() {
+    Employer employer = new Employer();
+    employer.setCompanyName("HH");
+
+    doInTransaction(() -> genericDao.save(employer));
+    Employer savedEmployer = employerService.getByIdPrefetched(employer.getId());
+    assertEquals(null, savedEmployer);
+  }
+
+  @Test
   public void getJustCompanyName() {
     Employer employer = new Employer();
     employer.setCompanyName("HH");
